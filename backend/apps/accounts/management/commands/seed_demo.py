@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand
 
 from apps.accounts.models import CustomerProfile, User
-from apps.cases.models import Case
+from apps.cases.models import Case, CaseUpdate
+from apps.messaging.models import Conversation, Message
 from apps.notifications.models import Notification
 from apps.solicitors.models import SolicitorProfile
 
@@ -54,17 +55,50 @@ class Command(BaseCommand):
 
         solicitor = SolicitorProfile.objects.filter(verification_status="verified").first()
         for case_index in range(1, 4):
-            Case.objects.get_or_create(
+            case, _ = Case.objects.get_or_create(
                 customer=customer,
                 title=f"Demo Case {case_index}",
                 defaults={
                     "solicitor": solicitor,
                     "legal_category": "Family Law",
                     "description": f"Portfolio sample case {case_index}.",
+                    "priority": "high" if case_index == 1 else "medium",
                     "status": "active" if case_index == 1 else "open",
                     "budget": 2000,
+                    "preferred_contact_method": "Email",
+                    "desired_outcome": "Clear guidance on the next legal step.",
+                    "client_notes": "Client uploaded intake summary and supporting documents.",
+                    "next_step": "Solicitor to review documents and provide initial recommendations.",
                 },
             )
+            CaseUpdate.objects.get_or_create(
+                case=case,
+                title="Case created",
+                defaults={
+                    "author": customer,
+                    "body": "Initial intake submitted through the customer dashboard.",
+                    "visibility": "shared",
+                },
+            )
+
+        first_case = Case.objects.filter(customer=customer).order_by("created_at").first()
+        if solicitor and first_case:
+            conversation, _ = Conversation.objects.get_or_create(
+                case=first_case,
+                subject="Tenancy dispute case discussion",
+            )
+            conversation.participants.add(customer, solicitor.user)
+            first_message, created = Message.objects.get_or_create(
+                conversation=conversation,
+                sender=customer,
+                content="Hello, I have uploaded the tenancy documents and would appreciate your initial view.",
+            )
+            if created:
+                Message.objects.create(
+                    conversation=conversation,
+                    sender=solicitor.user,
+                    content="I have reviewed the first set of files and will share a recommended next step shortly.",
+                )
 
         Notification.objects.get_or_create(
             user=customer,
@@ -76,4 +110,3 @@ class Command(BaseCommand):
         )
 
         self.stdout.write(self.style.SUCCESS("Demo data seeded successfully."))
-

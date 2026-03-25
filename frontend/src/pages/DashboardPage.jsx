@@ -1,11 +1,10 @@
+import { Link } from "react-router-dom";
+
+import { CaseCard } from "../components/CaseCard";
 import { DashboardSidebar } from "../components/DashboardSidebar";
 import { StatCard } from "../components/StatCard";
-
-const cases = [
-  { title: "Tenancy dispute review", status: "Active", solicitor: "Elaine Foster" },
-  { title: "Business contract review", status: "In review", solicitor: "Daniel Webb" },
-  { title: "Visa appeal guidance", status: "Pending", solicitor: "Sophie Carter" },
-];
+import { caseRecords } from "../features/cases/mockData";
+import { conversations } from "../features/messaging/mockData";
 
 export function DashboardPage() {
   return (
@@ -21,7 +20,7 @@ export function DashboardPage() {
           </div>
           <div className="flex gap-3">
             <button className="btn-secondary">Saved Solicitors</button>
-            <button className="btn-primary">Create New Case</button>
+            <Link to="/cases" className="btn-primary">Create New Case</Link>
           </div>
         </div>
 
@@ -41,39 +40,27 @@ export function DashboardPage() {
                   <h2 className="text-xl font-semibold text-slate-900">Top Cases</h2>
                   <p className="mt-1 text-sm text-slate-600">Your five most relevant matters appear here first.</p>
                 </div>
-                <button className="btn-secondary">View All</button>
+                <Link to="/cases" className="btn-secondary">View All</Link>
               </div>
-              <div className="mt-6 space-y-4">
-                {cases.map((legalCase) => (
-                  <article
-                    key={legalCase.title}
-                    className="rounded-xl border border-slate-200 bg-slate-50 p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-white hover:shadow-soft"
-                  >
-                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                      <div>
-                        <h3 className="text-base font-semibold text-slate-900">{legalCase.title}</h3>
-                        <p className="mt-1 text-sm text-slate-600">Assigned solicitor: {legalCase.solicitor}</p>
-                      </div>
-                      <span className="rounded-full bg-brand-100 px-3 py-1 text-sm font-semibold text-brand-800">
-                        {legalCase.status}
-                      </span>
-                    </div>
-                  </article>
+              <div className="mt-6 grid gap-4">
+                {caseRecords.map((legalCase) => (
+                  <CaseCard key={legalCase.id} legalCase={legalCase} />
                 ))}
               </div>
             </section>
 
             <section className="grid gap-6 xl:grid-cols-2">
               <div className="panel p-6">
-                <h2 className="text-xl font-semibold text-slate-900">Recent Messages</h2>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-slate-900">Recent Messages</h2>
+                  <Link to="/messages" className="btn-secondary">Open Inbox</Link>
+                </div>
                 <div className="mt-5 space-y-4">
-                  {[
-                    "Elaine Foster: I have reviewed the tenancy documents.",
-                    "Daniel Webb: I can take a call on Thursday afternoon.",
-                    "Support: Your appointment reminder has been scheduled.",
-                  ].map((item) => (
-                    <div key={item} className="rounded-lg border border-slate-200 p-4 text-sm text-slate-700">
-                      {item}
+                  {conversations.map((conversation) => (
+                    <div key={conversation.id} className="rounded-lg border border-slate-200 p-4 text-sm text-slate-700">
+                      <p className="font-semibold text-slate-900">{conversation.participant}</p>
+                      <p className="mt-1">{conversation.messages[conversation.messages.length - 1]?.text}</p>
+                      <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-400">{conversation.lastSeen}</p>
                     </div>
                   ))}
                 </div>

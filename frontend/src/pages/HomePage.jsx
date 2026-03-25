@@ -13,7 +13,7 @@ const features = [
   },
   {
     title: "Case Collaboration",
-    text: "Track matters with case statuses, secure file sharing, solicitor responses, and timeline visibility.",
+    text: "Track matters with case statuses, secure file sharing, solicitor responses, next steps, and timeline visibility.",
   },
   {
     title: "Professional Messaging",

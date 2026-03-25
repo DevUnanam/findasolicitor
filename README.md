@@ -72,3 +72,15 @@ npm run dev
 - Questionnaire-driven solicitor matching flow
 - Explainable recommendation scoring with fit percentages and match reasons
 - Dedicated frontend matching experience connected to discovery flows
+
+## Phase 4 progress
+
+- Case intake workflow and richer case lifecycle data
+- Case detail view with updates, attachments, and next-step context
+- Dashboard case management experience aligned with legal operations workflows
+
+## Phase 5 progress
+
+- Conversation-based messaging workspace with unread context
+- Case-linked professional chat UI and secure message composer
+- Backend conversation summaries, unread actions, and message metadata support
