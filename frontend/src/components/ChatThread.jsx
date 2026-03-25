@@ -1,4 +1,10 @@
-export function ChatThread({ conversation }) {
+import { useState } from "react";
+
+import { formatDateTime } from "../lib/formatters";
+
+export function ChatThread({ conversation, onSendMessage, isSending }) {
+  const [draft, setDraft] = useState("");
+
   if (!conversation) {
     return (
       <div className="panel flex min-h-[640px] items-center justify-center p-10 text-center">
@@ -8,6 +14,14 @@ export function ChatThread({ conversation }) {
         </div>
       </div>
     );
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    if (!draft.trim()) {
+      return;
+    }
+    onSendMessage(draft, () => setDraft(""));
   }
 
   return (
@@ -40,7 +54,7 @@ export function ChatThread({ conversation }) {
               </p>
               <p className="mt-2 leading-7">{message.text}</p>
               <p className={`mt-3 text-right text-xs ${message.own ? "text-brand-100" : "text-slate-400"}`}>
-                {message.time}
+                {formatDateTime(message.time)}
               </p>
             </div>
           </div>
@@ -48,17 +62,21 @@ export function ChatThread({ conversation }) {
       </div>
 
       <div className="border-t border-slate-200 bg-white p-5">
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <form className="rounded-2xl border border-slate-200 bg-slate-50 p-4" onSubmit={handleSubmit}>
           <textarea
             rows="3"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
             className="w-full resize-none bg-transparent text-sm text-slate-700 outline-none"
             placeholder="Write a secure message to continue this case conversation."
           />
           <div className="mt-4 flex items-center justify-between">
-            <button className="btn-secondary">Attach File</button>
-            <button className="btn-primary">Send Message</button>
+            <button type="button" className="btn-secondary">Attach File</button>
+            <button className="btn-primary" disabled={isSending}>
+              {isSending ? "Sending..." : "Send Message"}
+            </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

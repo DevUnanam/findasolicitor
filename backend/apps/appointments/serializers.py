@@ -10,6 +10,8 @@ class AvailabilitySlotSerializer(serializers.ModelSerializer):
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
+    solicitor_name = serializers.CharField(source="solicitor.user.get_full_name", read_only=True)
+
     class Meta:
         model = Appointment
         fields = (
@@ -17,6 +19,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
             "customer",
             "solicitor",
             "slot",
+            "solicitor_name",
             "notes",
             "status",
             "meeting_type",

@@ -1,3 +1,5 @@
+import { formatDateTime } from "../lib/formatters";
+
 export function ConversationList({ conversations, activeId, onSelect }) {
   return (
     <div className="panel p-4">
@@ -34,7 +36,7 @@ export function ConversationList({ conversations, activeId, onSelect }) {
               </div>
               <p className="mt-3 text-sm font-medium text-brand-700">{conversation.subject}</p>
               <p className="mt-2 text-sm text-slate-500">{conversation.caseTitle}</p>
-              <p className="mt-2 text-xs text-slate-400">{conversation.lastSeen}</p>
+              <p className="mt-2 text-xs text-slate-400">{formatDateTime(conversation.lastSeen)}</p>
             </button>
           );
         })}
@@ -42,4 +44,3 @@ export function ConversationList({ conversations, activeId, onSelect }) {
     </div>
   );
 }
-

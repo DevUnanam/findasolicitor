@@ -1,10 +1,11 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
 import { AppShell } from "../components/AppShell";
 import { SectionHeading } from "../components/SectionHeading";
 import { SolicitorCard } from "../components/SolicitorCard";
 import { StatCard } from "../components/StatCard";
-import { solicitorDirectory } from "../features/solicitors/mockData";
+import { getSolicitors } from "../lib/services";
 
 const features = [
   {
@@ -22,6 +23,32 @@ const features = [
 ];
 
 export function HomePage() {
+  const { data: solicitors = [], isLoading } = useQuery({
+    queryKey: ["featured-solicitors"],
+    queryFn: () => getSolicitors(),
+  });
+
+  const featuredSolicitors = [...solicitors]
+    .sort((a, b) => Number(b.average_rating) - Number(a.average_rating))
+    .slice(0, 3)
+    .map((solicitor) => ({
+      id: solicitor.id,
+      name: solicitor.full_name,
+      specialty: solicitor.specialization,
+      rating: Number(solicitor.average_rating || 0),
+      location: solicitor.location,
+      experience: solicitor.years_of_experience,
+      hourlyRate: solicitor.hourly_rate,
+      consultationFee: solicitor.consultation_fee,
+      verified: solicitor.verification_status === "verified",
+      availability: solicitor.is_available,
+      firmName: solicitor.firm_name,
+      serviceModes: solicitor.service_modes || [],
+      languages: solicitor.languages || [],
+      responseTime: `Responds within ${solicitor.response_time_hours} hours`,
+      bio: solicitor.about,
+    }));
+
   return (
     <AppShell>
       <main>
@@ -42,9 +69,9 @@ export function HomePage() {
                 <a href="#dashboard" className="btn-secondary">View Dashboard</a>
               </div>
               <div className="mt-10 grid gap-4 sm:grid-cols-3">
-                <StatCard label="Verified Solicitors" value="240+" helper="Reviewed by admin workflows" />
-                <StatCard label="Cases Managed" value="1.8k" helper="Structured status tracking" />
-                <StatCard label="Client Satisfaction" value="96%" helper="Ratings and reviews built in" />
+                <StatCard label="Verified Solicitors" value={`${solicitors.filter((item) => item.verification_status === "verified").length}+`} helper="Loaded from the live Django API" />
+                <StatCard label="Solicitor Profiles" value={`${solicitors.length}+`} helper="Nigeria-focused seeded dataset" />
+                <StatCard label="Live Directory" value="API" helper="Frontend connected to Django data" />
               </div>
             </div>
             <div className="panel-muted p-6 lg:p-8">
@@ -60,7 +87,7 @@ export function HomePage() {
                     </div>
                   ))}
                 </div>
-                <button className="btn-primary mt-6 w-full">Get Matches</button>
+                <Link to="/matching" className="btn-primary mt-6 w-full">Get Matches</Link>
               </div>
             </div>
           </div>
@@ -90,9 +117,13 @@ export function HomePage() {
               description="Every solicitor card is designed to surface the signals that help clients make informed decisions."
             />
             <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {solicitorDirectory.slice(0, 3).map((solicitor) => (
-                <SolicitorCard key={solicitor.id} solicitor={solicitor} />
-              ))}
+              {isLoading ? (
+                <div className="panel p-6 text-sm text-slate-600">Loading featured solicitors...</div>
+              ) : (
+                featuredSolicitors.map((solicitor) => (
+                  <SolicitorCard key={solicitor.id} solicitor={solicitor} />
+                ))
+              )}
             </div>
           </div>
         </section>

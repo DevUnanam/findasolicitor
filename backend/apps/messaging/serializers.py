@@ -26,6 +26,8 @@ class ConversationSerializer(serializers.ModelSerializer):
     messages = MessageSerializer(many=True, read_only=True)
     last_message = serializers.SerializerMethodField()
     unread_count = serializers.SerializerMethodField()
+    participant_details = serializers.SerializerMethodField()
+    case_title = serializers.CharField(source="case.title", read_only=True)
 
     class Meta:
         model = Conversation
@@ -37,6 +39,8 @@ class ConversationSerializer(serializers.ModelSerializer):
             "messages",
             "last_message",
             "unread_count",
+            "participant_details",
+            "case_title",
             "last_message_at",
             "is_archived",
             "created_at",
@@ -52,6 +56,16 @@ class ConversationSerializer(serializers.ModelSerializer):
         if not request or not request.user.is_authenticated:
             return 0
         return obj.messages.exclude(sender=request.user).filter(is_read=False).count()
+
+    def get_participant_details(self, obj):
+        return [
+            {
+                "id": participant.id,
+                "name": participant.get_full_name() or participant.email,
+                "role": participant.role,
+            }
+            for participant in obj.participants.all()
+        ]
 
 
 class ConversationCreateSerializer(serializers.Serializer):

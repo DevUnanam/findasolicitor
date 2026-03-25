@@ -1,7 +1,27 @@
+import { useQuery } from "@tanstack/react-query";
+
 import { AppShell } from "../components/AppShell";
-import { customerProfile } from "../features/profile/mockData";
+import { useAuth } from "../features/auth/AuthProvider";
+import { getCustomerProfile } from "../lib/services";
 
 export function ProfilePage() {
+  const { isReady } = useAuth();
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ["profile-me"],
+    queryFn: getCustomerProfile,
+    enabled: isReady,
+  });
+
+  if (!isReady || isLoading || !profile) {
+    return (
+      <AppShell>
+        <main className="mx-auto max-w-7xl px-4 py-16 text-sm text-slate-600 sm:px-6 lg:px-8">
+          Loading customer profile...
+        </main>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell>
       <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -15,14 +35,14 @@ export function ProfilePage() {
 
             <div className="mt-8 grid gap-5 md:grid-cols-2">
               {[
-                ["Full name", customerProfile.name],
-                ["Email", customerProfile.email],
-                ["Phone", customerProfile.phone],
-                ["Address", customerProfile.address],
-                ["City", customerProfile.city],
-                ["Country", customerProfile.country],
-                ["Preferred budget", customerProfile.budgetBand],
-                ["Contact method", customerProfile.contactMethod],
+                ["Full name", `${profile.user.first_name} ${profile.user.last_name}`.trim()],
+                ["Email", profile.user.email],
+                ["Phone", profile.user.phone || "Not provided"],
+                ["Address", profile.user.address || "Not provided"],
+                ["City", profile.city || "Not provided"],
+                ["Country", profile.country || "Not provided"],
+                ["Preferred budget", profile.preferred_budget_band || "Not provided"],
+                ["Contact method", profile.preferred_contact_method || "Not provided"],
               ].map(([label, value]) => (
                 <div key={label}>
                   <p className="mb-2 text-sm font-medium text-slate-700">{label}</p>
@@ -36,7 +56,7 @@ export function ProfilePage() {
             <div className="mt-8">
               <p className="mb-3 text-sm font-medium text-slate-700">Legal preferences</p>
               <div className="flex flex-wrap gap-2">
-                {customerProfile.legalPreferences.map((item) => (
+                {(profile.legal_preferences?.interests || []).map((item) => (
                   <span key={item} className="rounded-full bg-brand-100 px-3 py-1 text-sm font-medium text-brand-800">
                     {item}
                   </span>
@@ -49,21 +69,23 @@ export function ProfilePage() {
             <div className="panel p-6">
               <h2 className="text-xl font-semibold text-slate-900">Saved solicitors</h2>
               <div className="mt-5 space-y-3">
-                {customerProfile.savedSolicitors.map((item) => (
-                  <div key={item} className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                    {item}
+                {profile.saved_solicitors.map((item) => (
+                  <div key={item.id} className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                    {item.solicitor_name}
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="panel p-6">
-              <h2 className="text-xl font-semibold text-slate-900">Phase 2 coverage</h2>
-              <ul className="mt-5 space-y-3 text-sm text-slate-700">
-                <li className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">Editable account and preference structure</li>
-                <li className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">Saved solicitors view</li>
-                <li className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">Top-case-ready profile surface</li>
-              </ul>
+              <h2 className="text-xl font-semibold text-slate-900">Top cases</h2>
+              <div className="mt-5 space-y-3 text-sm text-slate-700">
+                {profile.top_cases.map((item) => (
+                  <div key={item.id} className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                    {item.title} • {item.status}
+                  </div>
+                ))}
+              </div>
             </div>
           </aside>
         </div>
@@ -71,4 +93,3 @@ export function ProfilePage() {
     </AppShell>
   );
 }
-

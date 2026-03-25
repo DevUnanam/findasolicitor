@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
 
@@ -5,7 +6,7 @@ import { AppShell } from "../components/AppShell";
 import { SearchFilters } from "../components/SearchFilters";
 import { SectionHeading } from "../components/SectionHeading";
 import { SolicitorCard } from "../components/SolicitorCard";
-import { searchFilters, solicitorDirectory } from "../features/solicitors/mockData";
+import { getSolicitors } from "../lib/services";
 
 export function SolicitorSearchPage() {
   const [selected, setSelected] = useState({
@@ -18,37 +19,59 @@ export function SolicitorSearchPage() {
     availableOnly: false,
   });
 
-  const results = useMemo(() => {
-    let filtered = [...solicitorDirectory];
+  const queryParams = useMemo(
+    () => ({
+      specialization: selected.specialty || undefined,
+      location: selected.location || undefined,
+      service_mode: selected.serviceMode || undefined,
+      rating: selected.rating || undefined,
+      verified: selected.verifiedOnly ? "true" : undefined,
+      availability: selected.availableOnly ? "true" : undefined,
+      sort: selected.sort,
+    }),
+    [selected],
+  );
 
-    if (selected.specialty) {
-      filtered = filtered.filter((item) => item.specialty === selected.specialty);
-    }
-    if (selected.location) {
-      filtered = filtered.filter((item) => item.location === selected.location);
-    }
-    if (selected.serviceMode) {
-      filtered = filtered.filter((item) => item.serviceModes.includes(selected.serviceMode));
-    }
-    if (selected.rating) {
-      filtered = filtered.filter((item) => item.rating >= Number(selected.rating));
-    }
-    if (selected.verifiedOnly) {
-      filtered = filtered.filter((item) => item.verified);
-    }
-    if (selected.availableOnly) {
-      filtered = filtered.filter((item) => item.availability);
-    }
+  const { data: solicitorResults = [], isLoading } = useQuery({
+    queryKey: ["solicitors", queryParams],
+    queryFn: () => getSolicitors(queryParams),
+  });
 
-    const sorters = {
-      rating: (a, b) => b.rating - a.rating,
-      experience: (a, b) => b.experience - a.experience,
-      price_low: (a, b) => a.hourlyRate - b.hourlyRate,
-      price_high: (a, b) => b.hourlyRate - a.hourlyRate,
+  const filters = useMemo(() => {
+    const specialties = [...new Set(solicitorResults.map((item) => item.specialization))];
+    const locations = [...new Set(solicitorResults.map((item) => item.location))];
+    const serviceModes = [...new Set(solicitorResults.flatMap((item) => item.service_modes || []))];
+
+    return {
+      specialties,
+      locations,
+      serviceModes,
+      sortOptions: [
+        { value: "rating", label: "Top rated" },
+        { value: "experience", label: "Most experienced" },
+        { value: "price_low", label: "Price: low to high" },
+        { value: "price_high", label: "Price: high to low" },
+      ],
     };
+  }, [solicitorResults]);
 
-    return filtered.sort(sorters[selected.sort]);
-  }, [selected]);
+  const results = solicitorResults.map((solicitor) => ({
+    id: solicitor.id,
+    name: solicitor.full_name,
+    specialty: solicitor.specialization,
+    rating: Number(solicitor.average_rating || 0),
+    location: solicitor.location,
+    experience: solicitor.years_of_experience,
+    hourlyRate: solicitor.hourly_rate,
+    consultationFee: solicitor.consultation_fee,
+    verified: solicitor.verification_status === "verified",
+    availability: solicitor.is_available,
+    firmName: solicitor.firm_name,
+    serviceModes: solicitor.service_modes || [],
+    languages: solicitor.languages || [],
+    responseTime: `Responds within ${solicitor.response_time_hours} hours`,
+    bio: solicitor.about,
+  }));
 
   function handleChange(field, value) {
     setSelected((current) => ({ ...current, [field]: value }));
@@ -60,11 +83,11 @@ export function SolicitorSearchPage() {
         <SectionHeading
           eyebrow="Advanced Search"
           title="Compare solicitors by fit, availability, price, and trust signals"
-          description="This Phase 2 experience is designed to feel like a realistic legal marketplace search workflow, with structured filters and clear profile summaries."
+          description="This experience now uses live Django data, so filters and solicitor cards reflect the actual seeded Nigerian legal directory."
         />
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[320px_1fr]">
-          <SearchFilters filters={searchFilters} selected={selected} onChange={handleChange} />
+          <SearchFilters filters={filters} selected={selected} onChange={handleChange} />
 
           <div className="space-y-5">
             <div className="panel flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
@@ -74,7 +97,7 @@ export function SolicitorSearchPage() {
               </div>
               <div className="flex flex-wrap gap-3">
                 <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                  Verified, filterable, and recruiter-friendly presentation
+                  Live API results with filter-backed solicitor metadata
                 </div>
                 <Link to="/matching" className="btn-secondary">
                   Use Smart Matching
@@ -83,9 +106,13 @@ export function SolicitorSearchPage() {
             </div>
 
             <div className="grid gap-6">
-              {results.map((solicitor) => (
-                <SolicitorCard key={solicitor.id} solicitor={solicitor} />
-              ))}
+              {isLoading ? (
+                <div className="panel p-6 text-sm text-slate-600">Loading solicitors...</div>
+              ) : (
+                results.map((solicitor) => (
+                  <SolicitorCard key={solicitor.id} solicitor={solicitor} />
+                ))
+              )}
             </div>
           </div>
         </div>
