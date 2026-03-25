@@ -34,6 +34,11 @@ export async function getSolicitor(id) {
   return response.data;
 }
 
+export async function getMySolicitorProfile() {
+  const response = await api.get("/solicitors/me/");
+  return response.data;
+}
+
 export async function getCases() {
   const response = await api.get("/cases/");
   return response.data;
