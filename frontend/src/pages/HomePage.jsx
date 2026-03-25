@@ -1,6 +1,10 @@
+import { Link } from "react-router-dom";
+
 import { AppShell } from "../components/AppShell";
 import { SectionHeading } from "../components/SectionHeading";
+import { SolicitorCard } from "../components/SolicitorCard";
 import { StatCard } from "../components/StatCard";
+import { solicitorDirectory } from "../features/solicitors/mockData";
 
 const features = [
   {
@@ -15,12 +19,6 @@ const features = [
     title: "Professional Messaging",
     text: "Built for trusted conversations with real-time chat, appointment context, and clear conversation history.",
   },
-];
-
-const solicitorCards = [
-  { name: "Elaine Foster", specialty: "Family Law", rating: "4.9", location: "London" },
-  { name: "Daniel Webb", specialty: "Immigration", rating: "4.8", location: "Manchester" },
-  { name: "Sophie Carter", specialty: "Property Law", rating: "4.7", location: "Birmingham" },
 ];
 
 export function HomePage() {
@@ -39,7 +37,8 @@ export function HomePage() {
                 structured case management, secure messaging, appointments, and transparent reviews.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
-                <a href="#solicitors" className="btn-primary">Find a Solicitor</a>
+                <Link to="/solicitors" className="btn-primary">Find a Solicitor</Link>
+                <Link to="/matching" className="btn-secondary">Get Smart Matches</Link>
                 <a href="#dashboard" className="btn-secondary">View Dashboard</a>
               </div>
               <div className="mt-10 grid gap-4 sm:grid-cols-3">
@@ -91,23 +90,8 @@ export function HomePage() {
               description="Every solicitor card is designed to surface the signals that help clients make informed decisions."
             />
             <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {solicitorCards.map((solicitor) => (
-                <article key={solicitor.name} className="panel p-6 transition-all duration-200 hover:scale-105 hover:shadow-lg">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900">{solicitor.name}</h3>
-                      <p className="mt-1 text-sm text-brand-700">{solicitor.specialty}</p>
-                    </div>
-                    <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-800">
-                      Verified
-                    </span>
-                  </div>
-                  <div className="mt-6 flex items-center justify-between text-sm text-slate-600">
-                    <span>{solicitor.location}</span>
-                    <span>{solicitor.rating} / 5.0</span>
-                  </div>
-                  <button className="btn-secondary mt-6 w-full">View Profile</button>
-                </article>
+              {solicitorDirectory.slice(0, 3).map((solicitor) => (
+                <SolicitorCard key={solicitor.id} solicitor={solicitor} />
               ))}
             </div>
           </div>
@@ -135,4 +119,3 @@ export function HomePage() {
     </AppShell>
   );
 }
-

@@ -113,6 +113,17 @@ class CustomerProfileViewSet(
         serializer = self.get_serializer(self.get_object())
         return Response(serializer.data)
 
+    @action(detail=False, methods=["get", "patch"], url_path="me")
+    def me(self, request):
+        profile = self.get_object()
+        if request.method.lower() == "get":
+            return Response(self.get_serializer(profile).data)
+
+        serializer = self.get_serializer(profile, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
 
 class SavedSolicitorViewSet(viewsets.ModelViewSet):
     serializer_class = SavedSolicitorSerializer
@@ -149,4 +160,3 @@ class DashboardSummaryView(APIView):
                 "top_cases": top_cases,
             }
         )
-

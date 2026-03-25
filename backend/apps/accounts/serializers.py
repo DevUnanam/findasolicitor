@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from apps.accounts.models import CustomerProfile, SavedSolicitor
+from apps.cases.models import Case
 
 User = get_user_model()
 
@@ -67,10 +68,23 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
 class CustomerProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    saved_solicitors = serializers.SerializerMethodField()
+    top_cases = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomerProfile
-        fields = ("id", "user", "legal_preferences", "bio")
+        fields = (
+            "id",
+            "user",
+            "legal_preferences",
+            "bio",
+            "city",
+            "country",
+            "preferred_contact_method",
+            "preferred_budget_band",
+            "saved_solicitors",
+            "top_cases",
+        )
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user", {})
@@ -78,6 +92,20 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             setattr(instance.user, attr, value)
         instance.user.save()
         return super().update(instance, validated_data)
+
+    def get_saved_solicitors(self, obj):
+        saved = (
+            obj.user.saved_solicitors.select_related("solicitor__user")
+            .order_by("-created_at")[:6]
+        )
+        return SavedSolicitorSerializer(saved, many=True).data
+
+    def get_top_cases(self, obj):
+        return list(
+            Case.objects.filter(customer=obj.user)
+            .order_by("-updated_at")
+            .values("id", "title", "status", "legal_category")[:5]
+        )
 
 
 class SavedSolicitorSerializer(serializers.ModelSerializer):
@@ -96,4 +124,3 @@ class FindasolicitorTokenSerializer(TokenObtainPairSerializer):
         token["role"] = user.role
         token["email"] = user.email
         return token
-

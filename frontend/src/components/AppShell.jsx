@@ -10,8 +10,10 @@ export function AppShell({ children }) {
           </Link>
           <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
             <a href="#services" className="transition-all duration-200 hover:text-brand-700">Services</a>
-            <a href="#solicitors" className="transition-all duration-200 hover:text-brand-700">Solicitors</a>
-            <a href="#dashboard" className="transition-all duration-200 hover:text-brand-700">Dashboard</a>
+            <Link to="/matching" className="transition-all duration-200 hover:text-brand-700">Matching</Link>
+            <Link to="/solicitors" className="transition-all duration-200 hover:text-brand-700">Solicitors</Link>
+            <Link to="/profile" className="transition-all duration-200 hover:text-brand-700">Profile</Link>
+            <Link to="/solicitor/onboarding" className="transition-all duration-200 hover:text-brand-700">Join as Solicitor</Link>
             <Link to="/dashboard" className="btn-primary">Open Demo</Link>
           </nav>
         </div>
@@ -20,4 +22,3 @@ export function AppShell({ children }) {
     </div>
   );
 }
-

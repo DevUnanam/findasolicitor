@@ -60,3 +60,15 @@ copy .env.example .env
 npm run dev
 ```
 
+## Phase 2 progress
+
+- Customer profile workspace and saved solicitor view
+- Solicitor onboarding and richer solicitor profile data model
+- Advanced solicitor search filters for specialization, location, rating, availability, and service mode
+- Solicitor detail experience ready for reviews, booking, and messaging integration
+
+## Phase 3 progress
+
+- Questionnaire-driven solicitor matching flow
+- Explainable recommendation scoring with fit percentages and match reasons
+- Dedicated frontend matching experience connected to discovery flows

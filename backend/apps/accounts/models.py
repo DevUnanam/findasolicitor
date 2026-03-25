@@ -27,6 +27,10 @@ class CustomerProfile(TimeStampedModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="customer_profile")
     legal_preferences = models.JSONField(default=dict, blank=True)
     bio = models.TextField(blank=True)
+    city = models.CharField(max_length=120, blank=True)
+    country = models.CharField(max_length=120, blank=True)
+    preferred_contact_method = models.CharField(max_length=30, blank=True)
+    preferred_budget_band = models.CharField(max_length=50, blank=True)
 
 
 class SavedSolicitor(TimeStampedModel):
@@ -39,4 +43,3 @@ class SavedSolicitor(TimeStampedModel):
 
     class Meta:
         unique_together = ("customer", "solicitor")
-

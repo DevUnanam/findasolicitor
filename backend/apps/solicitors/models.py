@@ -22,4 +22,8 @@ class SolicitorProfile(TimeStampedModel):
     documents = models.JSONField(default=list, blank=True)
     is_available = models.BooleanField(default=True)
     average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
-
+    service_modes = models.JSONField(default=list, blank=True)
+    consultation_fee = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    firm_name = models.CharField(max_length=160, blank=True)
+    languages = models.JSONField(default=list, blank=True)
+    response_time_hours = models.PositiveIntegerField(default=24)

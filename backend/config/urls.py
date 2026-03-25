@@ -10,7 +10,7 @@ from apps.accounts.views import (
 )
 from apps.appointments.views import AppointmentViewSet, AvailabilitySlotViewSet
 from apps.cases.views import CaseViewSet
-from apps.matching.views import MatchQuestionnaireView, MatchResultView
+from apps.matching.views import MatchHistoryView, MatchQuestionnaireView, MatchResultView
 from apps.messaging.views import ConversationViewSet, MessageViewSet
 from apps.notifications.views import NotificationViewSet
 from apps.payments.views import PaymentViewSet
@@ -37,4 +37,5 @@ urlpatterns = [
     path("api/dashboard/summary/", DashboardSummaryView.as_view(), name="dashboard-summary"),
     path("api/matching/questionnaire/", MatchQuestionnaireView.as_view(), name="matching-questionnaire"),
     path("api/matching/results/", MatchResultView.as_view(), name="matching-results"),
+    path("api/matching/history/", MatchHistoryView.as_view(), name="matching-history"),
 ]
