@@ -84,3 +84,10 @@ npm run dev
 - Conversation-based messaging workspace with unread context
 - Case-linked professional chat UI and secure message composer
 - Backend conversation summaries, unread actions, and message metadata support
+
+## Phase 6 progress
+
+- Appointment booking and consultation management surfaces
+- Payment history and Stripe-ready billing structure
+- Reviews workflow with solicitor rating synchronization
+- Dashboard polish covering appointments, payments, and reviews

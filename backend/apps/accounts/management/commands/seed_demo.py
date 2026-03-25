@@ -1,10 +1,15 @@
 from django.core.management.base import BaseCommand
 
 from apps.accounts.models import CustomerProfile, User
+from apps.appointments.models import Appointment, AvailabilitySlot
 from apps.cases.models import Case, CaseUpdate
 from apps.messaging.models import Conversation, Message
 from apps.notifications.models import Notification
+from apps.payments.models import Payment
+from apps.reviews.models import Review
 from apps.solicitors.models import SolicitorProfile
+from django.utils import timezone
+from datetime import timedelta
 
 
 class Command(BaseCommand):
@@ -99,6 +104,50 @@ class Command(BaseCommand):
                     sender=solicitor.user,
                     content="I have reviewed the first set of files and will share a recommended next step shortly.",
                 )
+
+            slot, _ = AvailabilitySlot.objects.get_or_create(
+                solicitor=solicitor,
+                start_time=timezone.now() + timedelta(days=1),
+                end_time=timezone.now() + timedelta(days=1, hours=1),
+                defaults={"is_booked": True},
+            )
+            Appointment.objects.get_or_create(
+                customer=customer,
+                solicitor=solicitor,
+                slot=slot,
+                defaults={
+                    "notes": "Initial case consultation",
+                    "status": "confirmed",
+                    "meeting_type": "video",
+                    "meeting_link": "https://example.com/meeting/findasolicitor-demo",
+                    "fee_amount": 95,
+                    "reminder_sent": True,
+                },
+            )
+
+            Payment.objects.get_or_create(
+                customer=customer,
+                solicitor=solicitor,
+                case=first_case,
+                amount=95,
+                defaults={
+                    "status": "paid",
+                    "payment_type": "consultation",
+                    "description": "Initial consultation fee",
+                    "paid_at": timezone.now(),
+                },
+            )
+
+            Review.objects.get_or_create(
+                customer=customer,
+                solicitor=solicitor,
+                defaults={
+                    "title": "Clear and reassuring advice",
+                    "rating": 5,
+                    "comment": "The advice was practical, timely, and easy to understand.",
+                    "would_recommend": True,
+                },
+            )
 
         Notification.objects.get_or_create(
             user=customer,

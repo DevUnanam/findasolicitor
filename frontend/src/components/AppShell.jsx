@@ -13,6 +13,8 @@ export function AppShell({ children }) {
             <Link to="/matching" className="transition-all duration-200 hover:text-brand-700">Matching</Link>
             <Link to="/solicitors" className="transition-all duration-200 hover:text-brand-700">Solicitors</Link>
             <Link to="/messages" className="transition-all duration-200 hover:text-brand-700">Messages</Link>
+            <Link to="/appointments" className="transition-all duration-200 hover:text-brand-700">Appointments</Link>
+            <Link to="/payments" className="transition-all duration-200 hover:text-brand-700">Payments</Link>
             <Link to="/profile" className="transition-all duration-200 hover:text-brand-700">Profile</Link>
             <Link to="/solicitor/onboarding" className="transition-all duration-200 hover:text-brand-700">Join as Solicitor</Link>
             <Link to="/dashboard" className="btn-primary">Open Demo</Link>

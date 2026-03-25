@@ -12,6 +12,17 @@ class AvailabilitySlotSerializer(serializers.ModelSerializer):
 class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
-        fields = ("id", "customer", "solicitor", "slot", "notes", "status", "created_at")
+        fields = (
+            "id",
+            "customer",
+            "solicitor",
+            "slot",
+            "notes",
+            "status",
+            "meeting_type",
+            "meeting_link",
+            "fee_amount",
+            "reminder_sent",
+            "created_at",
+        )
         read_only_fields = ("customer",)
-

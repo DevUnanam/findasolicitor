@@ -1,4 +1,6 @@
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .models import Appointment, AvailabilitySlot
 from .serializers import AppointmentSerializer, AvailabilitySlotSerializer
@@ -24,3 +26,22 @@ class AppointmentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(customer=self.request.user)
+
+    @action(detail=True, methods=["post"])
+    def confirm(self, request, pk=None):
+        appointment = self.get_object()
+        appointment.status = "confirmed"
+        appointment.reminder_sent = True
+        appointment.save(update_fields=["status", "reminder_sent", "updated_at"])
+        return Response(self.get_serializer(appointment).data)
+
+    @action(detail=False, methods=["get"])
+    def summary(self, request):
+        queryset = self.get_queryset()
+        return Response(
+            {
+                "total": queryset.count(),
+                "upcoming": queryset.filter(status__in=["pending", "confirmed"]).count(),
+                "completed": queryset.filter(status="completed").count(),
+            }
+        )

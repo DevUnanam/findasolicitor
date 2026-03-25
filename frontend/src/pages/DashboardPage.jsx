@@ -1,10 +1,16 @@
 import { Link } from "react-router-dom";
 
+import { AppointmentCard } from "../components/AppointmentCard";
 import { CaseCard } from "../components/CaseCard";
 import { DashboardSidebar } from "../components/DashboardSidebar";
+import { PaymentCard } from "../components/PaymentCard";
+import { ReviewCard } from "../components/ReviewCard";
 import { StatCard } from "../components/StatCard";
+import { appointments } from "../features/appointments/mockData";
 import { caseRecords } from "../features/cases/mockData";
 import { conversations } from "../features/messaging/mockData";
+import { payments } from "../features/payments/mockData";
+import { reviews } from "../features/reviews/mockData";
 
 export function DashboardPage() {
   return (
@@ -67,15 +73,39 @@ export function DashboardPage() {
               </div>
 
               <div className="panel p-6">
-                <h2 className="text-xl font-semibold text-slate-900">Upcoming Appointments</h2>
-                <div className="mt-5 space-y-4">
-                  {[
-                    "Thu 14:00 - Contract review with Daniel Webb",
-                    "Fri 10:30 - Family consultation with Elaine Foster",
-                  ].map((item) => (
-                    <div key={item} className="rounded-lg border border-slate-200 p-4 text-sm text-slate-700">
-                      {item}
-                    </div>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-slate-900">Upcoming Appointments</h2>
+                  <Link to="/appointments" className="btn-secondary">View Schedule</Link>
+                </div>
+                <div className="mt-5 grid gap-4">
+                  {appointments.map((appointment) => (
+                    <AppointmentCard key={appointment.id} appointment={appointment} />
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="grid gap-6 xl:grid-cols-2">
+              <div className="panel p-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-slate-900">Recent Payments</h2>
+                  <Link to="/payments" className="btn-secondary">Billing History</Link>
+                </div>
+                <div className="mt-5 grid gap-4">
+                  {payments.map((payment) => (
+                    <PaymentCard key={payment.id} payment={payment} />
+                  ))}
+                </div>
+              </div>
+
+              <div className="panel p-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-slate-900">Recent Reviews</h2>
+                  <Link to="/reviews" className="btn-secondary">View Reviews</Link>
+                </div>
+                <div className="mt-5 grid gap-4">
+                  {reviews.map((review) => (
+                    <ReviewCard key={review.id} review={review} />
                   ))}
                 </div>
               </div>

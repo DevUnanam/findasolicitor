@@ -24,4 +24,7 @@ class Appointment(TimeStampedModel):
     slot = models.ForeignKey(AvailabilitySlot, on_delete=models.SET_NULL, null=True, blank=True, related_name="appointments")
     notes = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
-
+    meeting_type = models.CharField(max_length=50, default="video")
+    meeting_link = models.CharField(max_length=255, blank=True)
+    fee_amount = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    reminder_sent = models.BooleanField(default=False)
