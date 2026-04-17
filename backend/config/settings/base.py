@@ -75,7 +75,7 @@ DATABASES = {
     }
 }
 
-if config("USE_SQLITE", default=False, cast=bool):
+if config("USE_SQLITE", default=True, cast=bool):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
